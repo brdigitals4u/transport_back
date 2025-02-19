@@ -1,0 +1,105 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model my_forms {
+  formid           String             @id @db.VarChar(50)
+  title            String?            @db.VarChar(255)
+  type             String?            @db.VarChar(50)
+  module           String?            @db.VarChar(50)
+  pkeys            String?            @db.VarChar(255)
+  pkeyid           String?            @db.VarChar(100)
+  dbtable          String?            @db.VarChar(100)
+  model            String?            @db.VarChar(100)
+  orderby          String?            @db.VarChar(100)
+  extra_props      String?            @db.VarChar(255)
+  readonly         Int?               @db.SmallInt
+  colsize          String?            @db.VarChar(10)
+  classes          String?            @db.VarChar(255)
+  hint             String?
+  sortno           Int?               @db.SmallInt
+  active           Int?               @default(1) @db.SmallInt
+  formview         String?            @db.VarChar(100)
+  formfilter       String?            @db.VarChar(100)
+  description      String?
+  formgroup        String?            @db.VarChar(255)
+  icon             String?            @db.VarChar(30)
+  my_forms_columns my_forms_columns[]
+}
+
+model my_forms_columns {
+  formid        String   @db.VarChar(50)
+  sectionid     String?  @db.VarChar(50)
+  field         String   @db.VarChar(100)
+  title         String?  @db.VarChar
+  colsize       String?  @db.VarChar(30)
+  type          String?  @db.VarChar(30)
+  component     String?  @db.VarChar(128)
+  required      Int?     @db.SmallInt
+  sortno        Int?     @db.SmallInt
+  active        Int?     @default(1) @db.SmallInt
+  formview      Int?     @default(1) @db.SmallInt
+  listview      Int?     @default(1) @db.SmallInt
+  selectqry     String?
+  options       Json?
+  defaultvalue  Json?
+  addattrs      Json?
+  readonly      Int?     @db.SmallInt
+  hidden        Int?     @db.SmallInt
+  classes       String?  @db.VarChar(255)
+  inline        Int?     @db.SmallInt
+  placeholder   String?  @db.VarChar(255)
+  hint          String?
+  dt_width      String?  @db.VarChar(10)
+  dt_sortable   Int?     @default(1) @db.SmallInt
+  dt_callback   String?  @db.VarChar(100)
+  dt_class      String?  @db.VarChar(100)
+  dt_rander     String?
+  dt_rowgroup   Int?     @db.SmallInt
+  dt_filter     Int?     @default(1) @db.SmallInt
+  dbfield       Int?     @default(1) @db.SmallInt
+  info          String?  @db.VarChar
+  title_lng     String?  @db.VarChar
+  printview     Int?     @db.SmallInt
+  printview_spl Int?     @default(0) @db.SmallInt
+  my_forms      my_forms @relation(fields: [formid], references: [formid], onDelete: NoAction, onUpdate: NoAction)
+
+  @@id([formid, field])
+}
+
+model my_forms_sections {
+  formid    String  @db.VarChar(50)
+  sectionid String  @db.VarChar(50)
+  title     String? @db.VarChar(255)
+  readonly  Int?    @db.SmallInt
+  colsize   String? @db.VarChar(30)
+  classes   String? @db.VarChar(255)
+  hint      String?
+  sortno    Int?    @db.SmallInt
+  active    Int?    @default(1) @db.SmallInt
+
+  @@id([formid, sectionid])
+}
+
+model User {
+  id        Int      @id @default(autoincrement())
+  name      String
+  email     String   @unique
+  password  String
+  role      Role
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+enum Role {
+  ADMIN
+  MANAGER
+  DRIVER
+  SHIPPER
+  CUSTOMER
+}

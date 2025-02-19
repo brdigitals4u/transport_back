@@ -1,0 +1,18 @@
+import * as jwt from "jsonwebtoken";
+import { JWT_SECRET } from "../secrets";
+
+type JWT_VERIFY = {
+  userId: string;
+};
+
+export const isAuthenticated = async (req: any, res: any, next: any) => {
+  const token = req?.headers?.authorization.replace(/^Bearer\s+/, "");
+
+  const isJwtVerify = jwt.verify(token, JWT_SECRET) as JWT_VERIFY;
+
+  if (isJwtVerify?.userId) {
+    next();
+  } else {
+    return res.status(401).send("Unauthorized");
+  }
+};

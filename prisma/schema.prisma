@@ -86,7 +86,7 @@ model my_forms_sections {
   @@id([formid, sectionid])
 }
 
-model User {
+model user {
   id        Int      @id @default(autoincrement())
   name      String
   email     String   @unique

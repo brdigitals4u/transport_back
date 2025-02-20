@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
-import { prismaClient } from ".."; // Assuming this is where your Prisma client instance is imported from
-import { isEmpty, omit } from "lodash";
-import { configServices } from "docker-compose";
+// import { prismaClient } from ".."; // Assuming this is where your Prisma client instance is imported from
+// import { isEmpty, omit } from "lodash";
+// import { configServices } from "docker-compose";
 
 export const GetCity = async (req: Request, res: Response) => {
   const { name,id } = req.body;

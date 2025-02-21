@@ -8,28 +8,29 @@ datasource db {
 }
 
 model my_forms {
-  formid           String             @id @db.VarChar(50)
-  title            String?            @db.VarChar(255)
-  type             String?            @db.VarChar(50)
-  module           String?            @db.VarChar(50)
-  pkeys            String?            @db.VarChar(255)
-  pkeyid           String?            @db.VarChar(100)
-  dbtable          String?            @db.VarChar(100)
-  model            String?            @db.VarChar(100)
-  orderby          String?            @db.VarChar(100)
-  extra_props      String?            @db.VarChar(255)
-  readonly         Int?               @db.SmallInt
-  colsize          String?            @db.VarChar(10)
-  classes          String?            @db.VarChar(255)
-  hint             String?
-  sortno           Int?               @db.SmallInt
-  active           Int?               @default(1) @db.SmallInt
-  formview         String?            @db.VarChar(100)
-  formfilter       String?            @db.VarChar(100)
-  description      String?
-  formgroup        String?            @db.VarChar(255)
-  icon             String?            @db.VarChar(30)
-  my_forms_columns my_forms_columns[]
+  formid            String              @id @db.VarChar(50)
+  title             String?             @db.VarChar(255)
+  type              String?             @db.VarChar(50)
+  module            String?             @db.VarChar(50)
+  pkeys             String?             @db.VarChar(255)
+  pkeyid            String?             @db.VarChar(100)
+  dbtable           String?             @db.VarChar(100)
+  model             String?             @db.VarChar(100)
+  orderby           String?             @db.VarChar(100)
+  extra_props       String?             @db.VarChar(255)
+  readonly          Int?                @db.SmallInt
+  colsize           String?             @db.VarChar(10)
+  classes           String?             @db.VarChar(255)
+  hint              String?
+  sortno            Int?                @db.SmallInt
+  active            Int?                @default(1) @db.SmallInt
+  formview          String?             @db.VarChar(100)
+  formfilter        String?             @db.VarChar(100)
+  description       String?
+  formgroup         String?             @db.VarChar(255)
+  icon              String?             @db.VarChar(30)
+  my_forms_columns  my_forms_columns[]
+  my_forms_sections my_forms_sections[] // Ensure this relation exists
 }
 
 model my_forms_columns {
@@ -73,15 +74,17 @@ model my_forms_columns {
 }
 
 model my_forms_sections {
-  formid    String  @db.VarChar(50)
-  sectionid String  @db.VarChar(50)
-  title     String? @db.VarChar(255)
-  readonly  Int?    @db.SmallInt
-  colsize   String? @db.VarChar(30)
-  classes   String? @db.VarChar(255)
-  hint      String?
-  sortno    Int?    @db.SmallInt
-  active    Int?    @default(1) @db.SmallInt
+  formid         String    @db.VarChar(50)
+  sectionid      String    @db.VarChar(50)
+  title          String?   @db.VarChar(255)
+  readonly       Int?      @db.SmallInt
+  colsize        String?   @db.VarChar(30)
+  classes        String?   @db.VarChar(255)
+  hint           String?
+  sortno         Int?      @db.SmallInt
+  active         Int?      @default(1) @db.SmallInt
+  my_forms       my_forms? @relation(fields: [my_formsFormid], references: [formid])
+  my_formsFormid String?   @db.VarChar(50)
 
   @@id([formid, sectionid])
 }

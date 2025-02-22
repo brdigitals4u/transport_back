@@ -2,10 +2,12 @@ import { Router } from "express";
 import { Course, GetCity, GetTutorsFilter, Timing, Classtype, Education } from "../controllers/service";
 import { GetCity2, GetCountry, GetState } from "../controllers/address";
 import { Form } from "../controllers/form";
+import { Menus } from "../controllers/menus";
 
 const ServiceRoutes:Router = Router()
 
 ServiceRoutes.post('/form', Form)
+ServiceRoutes.post('/menu', Menus)
 
 
 // ServiceRoutes.post('/city', GetCity)

@@ -7,7 +7,7 @@ import moment from "moment";
 //   data: any[];
 // }
 
-export const Form = async (req: Request, res: Response) => { 
+export const TableData = async (req: Request, res: Response) => { 
   const { formId } = req.body;
   try {
     if (!formId) {
@@ -44,7 +44,7 @@ export const Form = async (req: Request, res: Response) => {
     const headers = fields.map((field) => ({
       field: field.field,
       headerName: field.title ?? "",
-      width:250
+      width:150
     }));
 
     const allHeaders = [
@@ -55,7 +55,9 @@ export const Form = async (req: Request, res: Response) => {
     ];
 
     // ✅ Correct way to query a dynamic table name in Prisma
-    const rawData = await moment.$queryRawUnsafe<any[]>(`SELECT * FROM "${tableInfo.dbtable}"`);
+    //const rawData = await moment.$queryRawUnsafe<any[]>(`SELECT * FROM "${tableInfo.dbtable}"`);
+    const rawData = await prismaClient.$queryRawUnsafe<any[]>(`SELECT * FROM "${tableInfo.dbtable}"`);
+
 
     // ✅ Format date fields using moment.js
     const data = rawData.map((row: any) => ({
@@ -65,8 +67,8 @@ export const Form = async (req: Request, res: Response) => {
     }));
 
     console.log("Fetched Data:", allHeaders, data);
-
-    return { headers: allHeaders, data } as any; // ✅ Correct return structure
+    
+    return res.status(200).json({ headers: allHeaders, data } as any); // ✅ Correct return structure
   } catch (error: any) {
     console.error("Error fetching table data:", error.message);
     return { headers: [], data: [] };

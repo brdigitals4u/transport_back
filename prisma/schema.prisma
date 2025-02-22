@@ -30,7 +30,7 @@ model my_forms {
   formgroup         String?             @db.VarChar(255)
   icon              String?             @db.VarChar(30)
   my_forms_columns  my_forms_columns[]
-  my_forms_sections my_forms_sections[] // Ensure this relation exists
+  my_forms_sections my_forms_sections[]
 }
 
 model my_forms_columns {
@@ -83,8 +83,8 @@ model my_forms_sections {
   hint           String?
   sortno         Int?      @db.SmallInt
   active         Int?      @default(1) @db.SmallInt
-  my_forms       my_forms? @relation(fields: [my_formsFormid], references: [formid])
   my_formsFormid String?   @db.VarChar(50)
+  my_forms       my_forms? @relation(fields: [my_formsFormid], references: [formid])
 
   @@id([formid, sectionid])
 }
@@ -113,6 +113,18 @@ model carrier {
   createdAt           DateTime @default(now())
   updatedAt           DateTime @updatedAt
 }
+
+model menus {
+  id          Int     @id @default(autoincrement())
+  name        String  @db.VarChar(255)
+  path        String? @db.VarChar(255)
+  icon        String? @db.VarChar(255)
+  parent_id   Int?
+  roles       Json    @db.Json
+  menus       menus?  @relation("menusTomenus", fields: [parent_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  other_menus menus[] @relation("menusTomenus")
+}
+
 
 enum Role {
   ADMIN

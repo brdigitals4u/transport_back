@@ -99,6 +99,21 @@ model user {
   updatedAt DateTime @updatedAt
 }
 
+model carrier {
+  id                  Int      @id @default(autoincrement())
+  carrier_name        String
+  carrier_type        String
+  phone_number        String
+  email               String
+  max_load_capacity   String
+  trailer_length      String
+  fleet_size          String
+  additional_comments String
+  insurance_provider  String
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
+}
+
 enum Role {
   ADMIN
   MANAGER

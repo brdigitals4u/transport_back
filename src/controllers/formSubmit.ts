@@ -32,6 +32,7 @@ export const formSubmit = async (req: Request, res: Response) => {
     const createdRecord = await (prismaClient[modelName] as any).create({
       data: formData,
     });
+    console.log(createdRecord)
 
     return res.json({ success: true, message: "Data saved successfully", data: createdRecord });
 

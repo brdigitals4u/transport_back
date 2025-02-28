@@ -1,8 +1,9 @@
 import { Request, Response } from "express";
 import { prismaClient } from "..";
+import { executeDynamicQuery } from "../utils/executeDynamicQuery";
 
 export const Form = async (req: Request, res: Response) => {
-  const { formId } = req.body;
+  const { formId, dependencies } = req.body; // dependencies: { country_id: 1, state_id: 5 }
 
   try {
     // Fetch form details
@@ -17,12 +18,23 @@ export const Form = async (req: Request, res: Response) => {
     // Fetch sections
     const sections = await prismaClient.my_forms_sections.findMany({
       where: { formid: formId },
+      orderBy: { sortno: "asc" },
     });
 
     // Fetch columns
     const columns = await prismaClient.my_forms_columns.findMany({
       where: { formid: formId },
+      orderBy: { sortno: "asc" },
     });
+
+   // console.log(columns)
+    // Process `selectqry` and execute queries dynamically
+    for (const column of columns) {
+      if (column.selectqry) {
+        //console.log(column.selectqry)
+        column.options = await executeDynamicQuery(column.selectqry, '');
+      }
+    }
 
     // Map columns to their respective sections
     const sectionColumnsMap = new Map<string, any[]>();

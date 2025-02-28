@@ -21,7 +21,6 @@ export const Menus = async (req: Request, res: Response) => {
         parent_id: null,
       },
     });
-
     // Process each parent menu asynchronously
     const menusList = await Promise.all(
       getParentMenu

@@ -9,6 +9,7 @@ import moment from "moment";
 
 export const TableData = async (req: Request, res: Response) => { 
   const { formId } = req.body;
+  console.log(formId)
   try {
     if (!formId) {
       console.error("Error: formId is missing or undefined");
@@ -25,7 +26,7 @@ export const TableData = async (req: Request, res: Response) => {
       where: { formid: validFormId },
       select: { dbtable: true },
     });
-    //console.log("testing ------",tableInfo)
+    console.log("testing ------",tableInfo)
 
     if (!tableInfo || !tableInfo.dbtable) {
       console.error("Error: Table not found for formId:", validFormId);
@@ -66,7 +67,7 @@ export const TableData = async (req: Request, res: Response) => {
       updatedAt: row.updatedAt ? moment(row.updatedAt).format("YYYY-MM-DD HH:mm:ss") : null,
     }));
 
-    console.log("Fetched Data:", allHeaders, data);
+   // console.log("Fetched Data:", allHeaders, data);
     
     return res.status(200).json({ headers: allHeaders, data } as any); // ✅ Correct return structure
   } catch (error: any) {

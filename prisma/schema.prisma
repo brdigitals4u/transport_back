@@ -90,28 +90,139 @@ model my_forms_sections {
 }
 
 model user {
-  id        Int      @id @default(autoincrement())
+  id        Int       @id @default(autoincrement())
   name      String
-  email     String   @unique
+  email     String    @unique
   password  String
+  createdAt DateTime  @default(now())
+  updatedAt DateTime? @updatedAt
   role      Role
+}
+
+model carrier {
+  id                   Int      @id @default(autoincrement())
+  name                 String?
+  createdAt            DateTime @default(now())
+  updatedAt            DateTime @updatedAt
+  address              String?
+  address_line_2       String?
+  authority_type       String?
+  cargo__limit         String?
+  cargo_agent          String?
+  cargo_agent_phone    String?
+  cargo_city           String?
+  cargo_company_name   String?
+  cargo_deductable     String?
+  cargo_email          String?
+  cargo_expiration     String?
+  cargo_note           String?
+  cargo_phone          String?
+  cargo_policy         String?
+  cargo_state          String?
+  cargo_zip_code       String?
+  custom_carrier_id    String?
+  dba_name             String?
+  dot                  String?
+  email_address        String?
+  fed_tax_id           String?
+  highway_id           String?
+  manage_copmliance    String?
+  manage_expense       String?
+  manage_maintenance   String?
+  manage_settlements   String?
+  manage_sourcing      String?
+  mc                   String?
+  mcpio                String?
+  note                 String?
+  partner              String?
+  phone                String?
+  primary_agent        String?
+  primary_agent_phone  String?
+  primary_city         String?
+  primary_company_name String?
+  primary_deductable   String?
+  primary_email        String?
+  primary_expiration   String?
+  primary_limit        String?
+  primary_note         String?
+  primary_phone        String?
+  primary_policy       String?
+  primary_state        String?
+  primary_zip_code     String?
+  registration         String?
+  rmisd                String?
+  scac_code            String?
+  service_type         String?
+  state                String?
+  status               String?
+  use_factoring        String?
+  website              String?
+  zipcode              String?
+  city                 String?
+}
+
+model trailer {
+  id                       Int      @id @default(autoincrement())
+  type                     String?
+  model                    String?
+  make                     String?
+  vin                      String?
+  status                   String?
+  plate_number             String?
+  gvwr                     String?
+  length                   String?
+  carrier_name             String?
+  policy_no                String?
+  provider                 String?
+  policy_year              String?
+  policy_exp               String?
+  state_of_registration    String?
+  width                    String?
+  height                   String?
+  ownership_type           String?
+  color                    String?
+  braking_system           String?
+  dot_certification_number String?
+  tracking_gps             String?
+  cargo_type               String?
+  expiry_year              String?
+  createdAt                DateTime @default(now())
+  updatedAt                DateTime @updatedAt
+}
+
+model trailertype {
+  id        Int      @id @default(autoincrement())
+  name      String?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
 
-model carrier {
-  id                  Int      @id @default(autoincrement())
-  carrier_name        String
-  carrier_type        String
-  phone_number        String
-  email               String
-  max_load_capacity   String
-  trailer_length      String
-  fleet_size          String
-  additional_comments String
-  insurance_provider  String
-  createdAt           DateTime @default(now())
-  updatedAt           DateTime @updatedAt
+model drivers {
+  id                         Int      @id @default(autoincrement())
+  full_name                  String?
+  dob                        String?
+  gender                     String?
+  contact_number             String?
+  email                      String?
+  street_address             String?
+  city                       String?
+  state                      String?
+  zip_code                   String?
+  country                    String?
+  license_number             String?
+  license_expiry_date        String?
+  license_type               String?
+  certifications             String?
+  vehicle_assigned           String?
+  employment_type            String?
+  doj                        String?
+  shift_schedule             String?
+  manager_supervisor_id      String?
+  medical_certificate_expiry String?
+  background_check_status    String?
+  drug_test_status           String?
+  createdAt                  DateTime @default(now())
+  updatedAt                  DateTime @updatedAt
 }
 
 model menus {
@@ -125,6 +236,77 @@ model menus {
   other_menus menus[] @relation("menusTomenus")
 }
 
+model vehicle {
+  id           Int      @id @default(autoincrement())
+  vehiclename  String   @db.VarChar(255)
+  vehiclemodel String   @db.VarChar(255)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
+model city {
+  id           Int     @id @default(autoincrement())
+  name         String
+  state_id     Int
+  state_code   String?
+  country_id   Int
+  country_code String?
+  latitude     Decimal
+  longitude    Decimal
+  created_at   String?
+  updated_at   String?
+  flag         Boolean @default(true)
+  wikiDataId   String?
+  country      country @relation(fields: [country_id], references: [id])
+  state        state   @relation(fields: [state_id], references: [id])
+}
+
+model country {
+  id              Int       @id @default(autoincrement())
+  name            String    @unique
+  iso3            String?
+  numeric_code    String?
+  iso2            String?
+  phonecode       String?
+  capital         String?
+  currency        String?
+  currency_name   String?
+  currency_symbol String?
+  tld             String?
+  native          String?
+  regionId        Int?
+  subregion_id    Int?
+  nationality     String?
+  timezones       String?
+  translations    String?
+  latitude        Decimal?
+  longitude       Decimal?
+  emoji           String?
+  emojiU          String?
+  created_at      DateTime?
+  updated_at      DateTime
+  flag            Boolean   @default(true)
+  wikiDataId      String?
+  subreligion     String?
+  city            city[]
+}
+
+model state {
+  id           Int       @id @default(autoincrement())
+  name         String
+  country_id   Int
+  country_code String?
+  fips_code    String?
+  iso2         String?
+  type         String?
+  latitude     Decimal?
+  longitude    Decimal?
+  created_at   DateTime?
+  updated_at   DateTime
+  flag         Boolean   @default(true)
+  wikiDataId   String?
+  city         city[]
+}
 
 enum Role {
   ADMIN

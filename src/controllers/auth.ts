@@ -1,4 +1,4 @@
-import { NextFunction, Request, Response, response } from "express";
+import { NextFunction, Request, Response } from "express";
 import { prismaClient } from "..";
 import { compareSync, hashSync } from "bcrypt";
 import * as jwt from "jsonwebtoken";
@@ -30,7 +30,7 @@ export const SignUp = async (
     });
   }
 
-  if (role !== (role as "student" | "tutor")) {
+  if (role !== (role as "ADMIN" | "CARRIER")) {
     return res.status(404).json({
       code: errorCode.USER_ALREADY_EXISTS,
       message: "User role doesn't not exist",

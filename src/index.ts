@@ -10,7 +10,7 @@ const app: Express = express();
 
 // Define your CORS options
 let corsOptions = { 
-  origin: ['http://localhost:3000', 'http://anotherdomain.com', 'https://transport-front-git-dev-brdigitals4us-projects.vercel.app', 'https://transport-front-chi.vercel.app'], // Replace with your allowed origins
+  origin: ['http://localhost:3000', 'http://anotherdomain.com', 'https://transport-front-git-dev-brdigitals4us-projects.vercel.app', 'https://transport-front-chi.vercel.app', 'http://52.53.157.148:8000'], // Replace with your allowed origins
   methods: "POST,GET,PUT,DELETE",
   credentials: true,
   allowedHeaders: ['Content-Type', 'Authorization'], // Add other headers if needed

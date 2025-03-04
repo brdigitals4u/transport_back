@@ -159,6 +159,7 @@ model carrier {
   website              String?
   zipcode              String?
   city                 String?
+  //load                 load[]
 }
 
 model trailer {
@@ -199,7 +200,7 @@ model trailertype {
 
 model drivers {
   id                         Int      @id @default(autoincrement())
-  full_name                  String?
+  name                       String?
   dob                        String?
   gender                     String?
   contact_number             String?
@@ -223,6 +224,7 @@ model drivers {
   drug_test_status           String?
   createdAt                  DateTime @default(now())
   updatedAt                  DateTime @updatedAt
+  //load                       load[]
 }
 
 model menus {
@@ -306,6 +308,76 @@ model state {
   flag         Boolean   @default(true)
   wikiDataId   String?
   city         city[]
+}
+
+model loadorders {
+  id                             Int      @id @default(autoincrement())
+  client_name                    String?
+  client_company_name            String?
+  client_email                   String?
+  client_phone                   String?
+  client_billing_address         String?
+  client_billing_city            String?
+  client_billing_state           String?
+  client_type_of_load            String?
+  client_cargo_description       String?
+  client_weight                  String?
+  client_weight_type             String?
+  client_number_of_pallets       String?
+  client_hazardous_materials     String?
+  client_pickup_address          String?
+  client_pickup_city             String?
+  client_pickup_state            String?
+  client_pickup_zip_code         String?
+  client_pickup_date             String?
+  client_contact_person_pickup   String?
+  client_pickup_contact_phone    String?
+  client_delivery_address        String?
+  client_delivery_city           String?
+  client_delivery_state          String?
+  client_delivery_zip_code       String?
+  client_delivery_date           String?
+  client_contact_person_delivery String?
+  client_delivery_contact_phone  String?
+  cleint_special_instructions    String?
+  createdAt                      DateTime @default(now())
+  updatedAt                      DateTime @updatedAt
+
+  //carrier carrier? @relation(fields: [carrier_id], references: [id], onDelete: SetNull)
+  //driver  drivers? @relation(fields: [driver_id], references: [id], onDelete: SetNull)
+}
+
+model load {
+  id                Int        @id @default(autoincrement())
+  load_number       String     @unique @db.VarChar(50) // Unique Load Number
+  carrier_id        String? // Associated Carrier
+  driver_id         String? // Assigned Driver (Initially NULL)
+  pickup_date       String?
+  pickup_location   String?    @db.VarChar(255)
+  pick_city         String?
+  pick_state        String?
+  delivery_location String?    @db.VarChar(255)
+  delivery_date     String?
+  deli_city         String?
+  deli_state        String?
+  weight            Decimal
+  freight_type      String?    @db.VarChar(50) // e.g., Dry Van, Refrigerated, Flatbed
+  status            LoadStatus @default(PENDING)
+  //rate              Decimal? // Agreed rate for the load
+  additional_notes  String?
+  createdAt         DateTime   @default(now())
+  updatedAt         DateTime   @updatedAt
+
+  //carrier carrier? @relation(fields: [carrier_id], references: [id], onDelete: SetNull)
+  //driver  drivers? @relation(fields: [driver_id], references: [id], onDelete: SetNull)
+}
+
+enum LoadStatus {
+  PENDING // Load is created but not yet assigned
+  ASSIGNED // Load assigned to a driver
+  IN_TRANSIT // Driver has picked up the load
+  DELIVERED // Load delivered successfully
+  CANCELED // Load canceled
 }
 
 enum Role {

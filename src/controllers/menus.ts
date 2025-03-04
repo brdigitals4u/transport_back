@@ -34,6 +34,9 @@ export const Menus = async (req: Request, res: Response) => {
             where: {
               parent_id: menu.id,
             },
+            orderBy:{
+              id:"asc"
+            }
           });
           if(subItems.length > 0){
             return {

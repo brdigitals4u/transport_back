@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
 import { prismaClient } from "..";
 import moment from "moment";
+import ImageKit from "imagekit";
 
 // interface TableDataResponse {
 //   headers: { field: string; headerName: string; width: number }[];
@@ -74,4 +75,55 @@ export const TableData = async (req: Request, res: Response) => {
     console.error("Error fetching table data:", error.message);
     return { headers: [], data: [] };
   }
+}
+
+
+export const getEditData = async (req: Request, res: Response) => { 
+  const { formId, editId, target } = req.body;
+  console.log(formId, editId, target)
+  try {
+    if (!formId) {
+      console.error("Error: formId is missing or undefined");
+      return { data: [] };
+    }
+    if (!formId) {
+      console.error("Error: formId must be a valid number");
+      return { data: [] };
+    }
+    const tableInfo = await prismaClient.my_forms.findUnique({
+      where: { formid: formId },
+      select: { dbtable: true },
+    });
+    if (!tableInfo || !tableInfo.dbtable) {
+      console.error("Error: Table not found for formId:", formId);
+      return { data: [] };
+    }
+    if(target === "edit"){
+      const data = await prismaClient.$queryRawUnsafe<any[]>(`SELECT * FROM "${tableInfo.dbtable}" WHERE id=${editId}`);
+      console.log(data)
+       return res.status(200).json({ data:data } as any); 
+    }
+    if(target === "delete"){
+       await prismaClient.$queryRawUnsafe<any[]>(`DELETE FROM "${tableInfo.dbtable}" WHERE id=${editId}`);
+       return res.status(200).json({ message: "Record deleted successfully", dataDelete:true } as any); 
+    }
+    return res.status(400).json({ error: "Invalid target action" });
+  } catch (error: any) {
+    console.error("Error fetching table data:", error.message);
+    return { data: [] };
+  }
+}
+
+
+
+const imagekit = new ImageKit({
+  publicKey: 'public_Hz2jf25tEf60/CkNVogH4eJrYsA=',
+  privateKey: 'private_phGhIl4tFeX3oHV6iPgpIJSmEfs=',
+  urlEndpoint: 'https://ik.imagekit.io/dileepskb350',
+});
+
+export const imageUpload = async (req: Request, res: Response) => { 
+  console.log(req.body)
+  const authParams = imagekit.getAuthenticationParameters();
+  res.send(authParams);
 }

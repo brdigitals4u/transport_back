@@ -1,5 +1,11 @@
 import { Request, Response } from "express";
 import { prismaClient } from "..";
+import { JWT_SECRET } from "../secrets";
+import * as jwt from "jsonwebtoken";
+import { hashSync } from "bcrypt";
+import { JwtPayload } from "jsonwebtoken";
+import { transporter } from "../utils/mailTransporter";
+import { mailSend, mailSendUser } from "../utils/mailSend";
 
 export const formSubmit = async (req: Request, res: Response) => {
   const { formId, formData } = req.body;
@@ -33,6 +39,14 @@ export const formSubmit = async (req: Request, res: Response) => {
       data: formData,
     });
     console.log(createdRecord)
+    
+    if(dbtable.dbtable === "user"){
+      const email = formData?.email
+      const message = formData?.name;
+      await mailSendUser({message, email})
+    }
+
+
 
     return res.json({ success: true, message: "Data saved successfully", data: createdRecord });
 
@@ -41,3 +55,25 @@ export const formSubmit = async (req: Request, res: Response) => {
     return res.json({ success: false, message: "Internal Server Error", error: error?.message || String(error) });
   }
 };
+
+
+
+
+export const SendMailFuc = async (req:any, res:Response) => {
+  const { email } = req.body;
+
+  try {
+    // Reset password link
+    const message = `test`;
+
+    await mailSend({message, email})
+
+    return res.json({ message: "Password reset link sent to email" });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ message: "Internal server error" });
+  }
+};
+
+
+

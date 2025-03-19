@@ -20,6 +20,9 @@ export const Menus = async (req: Request, res: Response) => {
       where: {
         parent_id: null,
       },
+      orderBy:{
+        sort:"asc"
+      }
     });
     // Process each parent menu asynchronously
     const menusList = await Promise.all(
@@ -35,7 +38,7 @@ export const Menus = async (req: Request, res: Response) => {
               parent_id: menu.id,
             },
             orderBy:{
-              id:"asc"
+              sort:"asc"
             }
           });
           if(subItems.length > 0){

@@ -61,6 +61,7 @@ export const Form = async (req: Request, res: Response) => {
     const result: any = {
       formid: form.formid,
       title: form.title,
+      classes: form.classes,
       sections: structuredSections,
     };
 

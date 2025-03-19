@@ -90,7 +90,7 @@ model my_forms_sections {
 }
 
 model user {
-  id        Int       @id @default(autoincrement())
+  id        Int       @id @default(autoincrement())    
   name      String
   email     String    @unique
   password  String
@@ -234,6 +234,7 @@ model menus {
   icon        String? @db.VarChar(255)
   parent_id   Int?
   roles       Json    @db.Json
+  sort        Int?
   menus       menus?  @relation("menusTomenus", fields: [parent_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
   other_menus menus[] @relation("menusTomenus")
 }
@@ -386,4 +387,5 @@ enum Role {
   DRIVER
   SHIPPER
   CUSTOMER
+  CARRIER
 }

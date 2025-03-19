@@ -5,6 +5,8 @@ import * as jwt from "jsonwebtoken";
 import { JWT_SECRET } from "../secrets";
 import { BadRequestException } from "../exceptions/bad-request";
 import { errorCode } from "../exceptions/root";
+import nodemailer from "nodemailer";
+import { JwtPayload } from "jsonwebtoken";
 
 export const SignUp = async (
   req: Request,
@@ -18,8 +20,6 @@ export const SignUp = async (
       message: `'role' field is required!`,
     });
   }
-
-
 
   let user = await prismaClient.user.findFirst({ where: { email } });
 
@@ -46,29 +46,28 @@ export const SignUp = async (
 
     let nextId = maxIdUser ? maxIdUser.id + 1 : 1;
 
+    user = await prismaClient.user.create({
+      data: {
+        id: nextId,
+        name,
+        email,
+        role: role,
+        password: hashSync(password, 10),
+      },
+    });
+    const token = jwt.sign(
+      {
+        userId: user.id,
+      },
+      JWT_SECRET
+    );
 
-  user = await prismaClient.user.create({
-    data: {
-      id:nextId,
-      name,
-      email,
-      role: role,
-      password: hashSync(password, 10),
-    },
-  });
-  const token = jwt.sign(
-    {
-      userId: user.id,
-    },
-    JWT_SECRET
-  );
-
-  return res.status(200).json({user,token});
-} catch (error) {
-  return res.status(404).json({
-    message: error,
-  });
-}
+    return res.status(200).json({ user, token });
+  } catch (error) {
+    return res.status(404).json({
+      message: error,
+    });
+  }
 };
 
 export const login = async (req: Request, res: Response) => {
@@ -98,95 +97,77 @@ export const login = async (req: Request, res: Response) => {
   return res.status(200).json({ user, token });
 };
 
-// export const Address = async (
-//   req: Request,
-//   res: Response,
-//   next: NextFunction
-// ) => {
-//   const {
-//     address,
-//     cityId,
-//     tutorId,
-//     courseId,
-//     profilePic,
-//     classType,
-//     education,
-//     timing,
-//   } = req.body;
-  
 
-//   try {
-//     let result = await prismaClient.profile.upsert({
-//       where: { tutorId },
-//       create: {
-//         address,
-//         cityId,
-//         tutorId,
-//         courseId,
-//         profilePic,
-//         classType,
-//         education,
-//         timing,
-//       },
-//       update: {
-//         address,
-//         cityId,
-//         courseId,
-//         profilePic,
-//         classType,
-//         education,
-//         timing,
-//       },
-//     });
-//     let message = result.updatedAt.getTime() - result.createdAt.getTime() <= 1000 ? "Successfully added" : "Successfully updated";
-//     console.log({data:result, message})
-//     return res.status(200).json({data:result, message});
-//   } catch (error: any) {
-//     console.log(error)
-//     return res.status(404).json({
-//       ...error?.meta,
-//       message: "field should be unique",
-//       code: errorCode.MISSING_REQUIRED_ROLL,
-//     });
-//   }
-// };
+export const Forgotpassword = async (req:any, res:Response) => {
+  const { email } = req.body;
 
-// export const CreateCourse = async (
-//   req: Request,
-//   res: Response,
-//   next: NextFunction
-// ) => {
-//   const { name } = req.body;
+  try {
+    const user = await prismaClient.user.findUnique({ where: { email } });
+    if (!user) return res.status(404).json({ message: "User not found" });
 
-//   if (!name || typeof name !== "string") {
-//     return res.status(404).json({
-//       message: "'name' field is required and must be a string!",
-//       code: errorCode.USER_ALREADY_EXISTS,
-//     });
-//   }
+    // Generate reset token (valid for 1 hour)
+    const token = jwt.sign({ email }, JWT_SECRET, {
+      expiresIn: "1h",
+    });
 
-//   try {
-//     let course = await prismaClient.course.findFirst({ where: { name: name } });
+    // Reset password link
+    const resetLink = `${process.env.FRONTEND_URL}/reset-password?user=${token}`;
+    //upia whlh jyju lutg
+    // Send email
+    const transporter = nodemailer.createTransport({
+      service: "gmail",
+      auth: {
+        user: process.env.EMAIL_USER,
+        pass: process.env.EMAIL_PASS,
+      },
+    });
 
-//     if (!course) {
-//       return res.status(404).json({
-//         message: "Course already exists!",
-//         code: errorCode.USER_ALREADY_EXISTS,
-//       });
-//     }
+    await transporter.sendMail({
+      from: process.env.EMAIL_USER,
+      to: email,
+      subject: "Password Reset Request",
+      html: `<p>Click <a href="${resetLink}">here</a> to reset your password. The link is valid for 1 hour.</p>`,
+    });
 
-//     course = await prismaClient.course.create({
-//       data: {
-//         name: name,
-//         createdAt: new Date(),
-//         updatedAt: new Date(),
-//       },
-//     });
+    return res.json({ message: "Password reset link sent to email" });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ message: "Internal server error" });
+  }
+};
 
-//     return res.json(course);
-//   } catch (error) {
-//     return res.status(404).json({
-//       message: error,
-//     });
-//   }
-// };
+
+// Reset Password API
+export const ForgotpasswordToken = async (req:any, res:Response) => {
+  const { token } = req.params;
+  const { newPassword } = req.body;
+  console.log(token, newPassword)
+
+  try {
+    const decoded = jwt.verify(token, process.env.JWT_SECRET as string) as JwtPayload;
+
+    if (!decoded || typeof decoded === "string") {
+      return res.status(400).json({ message: "Invalid token" });
+    }
+
+    const userEmail = decoded.email as string;
+
+    const user = await prismaClient.user.findUnique({
+      where: { email: userEmail },
+    });
+
+    if (!user) return res.status(404).json({ message: "User not found" });
+
+    // Hash new password
+    const hashedPassword = hashSync(newPassword, 10);
+    await prismaClient.user.update({
+      where: { email: userEmail },
+      data: { password: hashedPassword },
+    });
+
+    return res.json({ message: "Password updated successfully" });
+  } catch (error) {
+    console.error(error);
+    return res.status(400).json({ message: "Invalid or expired token" });
+  }
+}

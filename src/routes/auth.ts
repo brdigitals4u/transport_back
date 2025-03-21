@@ -11,7 +11,7 @@ AuthRoutes.post('/signup', SignUp)
 AuthRoutes.post('/forgot-password', Forgotpassword)
 AuthRoutes.post('/reset-password/:token', ForgotpasswordToken)
 
-AuthRoutes.post('/submitdata', formSubmit)
+AuthRoutes.post('/submitdata', isAuthenticated, formSubmit)
 AuthRoutes.post('/tabledata', TableData)
 AuthRoutes.post('/geteditdata', getEditData)
 

@@ -5,7 +5,6 @@ import { Request, Response } from "express";
 
 export const GetCity = async (req: Request, res: Response) => {
   const { name,id } = req.body;
-  console.log("Dileep -------------------------",id)
   // try {
   //   let cities = await prismaClient.city.findMany({
   //     where: {

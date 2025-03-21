@@ -9,9 +9,8 @@ export const executeDynamicQuery = async (query: string, dependencies: any) => {
 
     // Execute the raw SQL query and explicitly cast the result
     const results = (await prismaClient.$queryRawUnsafe(query)) as { id: number; name: string }[];
-    // console.log(results)
     return results.map((row) => ({
-      value: row.name,
+      value: row.id,
       label: row.name,
     }));
 

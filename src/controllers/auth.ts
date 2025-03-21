@@ -42,7 +42,7 @@ export const SignUp = async (
     });
 
     // Calculate the next available ID
-    // console.log('dileep',maxIdUser)
+
 
     let nextId = maxIdUser ? maxIdUser.id + 1 : 1;
 

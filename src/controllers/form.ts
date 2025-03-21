@@ -31,7 +31,7 @@ export const Form = async (req: Request, res: Response) => {
     // Process `selectqry` and execute queries dynamically
     for (const column of columns) {
       if (column.selectqry) {
-        //console.log(column.selectqry)
+        console.log("dileep", column.selectqry)
         column.options = await executeDynamicQuery(column.selectqry, '');
       }
     }

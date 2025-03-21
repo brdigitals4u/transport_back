@@ -11,6 +11,12 @@ export const isAuthenticated = async (req: any, res: any, next: any) => {
   const isJwtVerify = jwt.verify(token, JWT_SECRET) as JWT_VERIFY;
 
   if (isJwtVerify?.userId) {
+    const decoded = jwt.verify(token, JWT_SECRET) as JWT_VERIFY;
+
+    if (!decoded?.userId) {
+      return res.status(401).json({ message: "Unauthorized: Invalid token" });
+    }
+    req.userId = decoded.userId; 
     next();
   } else {
     return res.status(401).send("Unauthorized");

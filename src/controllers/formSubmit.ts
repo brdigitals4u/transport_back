@@ -7,7 +7,9 @@ import { JwtPayload } from "jsonwebtoken";
 import { transporter } from "../utils/mailTransporter";
 import { mailSend, mailSendUser } from "../utils/mailSend";
 
-export const formSubmit = async (req: Request, res: Response) => {
+export const formSubmit = async (req: any, res: Response) => {
+  const userId = req.userId;
+  //console.log(userId)
   const { formId, formData } = req.body;
   
   try {
@@ -27,17 +29,15 @@ export const formSubmit = async (req: Request, res: Response) => {
     if (!dbtable || !dbtable.dbtable) {
       return res.json({ success: false, message: "Table not found" });
     }
-
-    // Dynamically access the Prisma model
     const modelName = dbtable.dbtable as keyof typeof prismaClient;
 
     if (!prismaClient[modelName]) {
       return res.json({ success: false, message: `Table does not exist in Prisma client` });
     }
-
     const createdRecord = await (prismaClient[modelName] as any).create({
       data: formData,
     });
+
     console.log(createdRecord)
     
     if(dbtable.dbtable === "user"){
@@ -45,11 +45,7 @@ export const formSubmit = async (req: Request, res: Response) => {
       const message = formData?.name;
       await mailSendUser({message, email})
     }
-
-
-
     return res.json({ success: true, message: "Data saved successfully", data: createdRecord });
-
   } catch (error: any) {
     console.error("General Error:", error);
     return res.json({ success: false, message: "Internal Server Error", error: error?.message || String(error) });

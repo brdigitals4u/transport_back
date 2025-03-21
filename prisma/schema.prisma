@@ -159,6 +159,7 @@ model carrier {
   website              String?
   zipcode              String?
   city                 String?
+  user_id               Int?
   //load                 load[]
 }
 

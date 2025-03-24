@@ -2,9 +2,11 @@ import { Request, Response } from "express";
 import { prismaClient } from "..";
 import { executeDynamicQuery } from "../utils/executeDynamicQuery";
 
-export const Form = async (req: Request, res: Response) => {
+export const Form = async (req: any, res: Response) => {
   const { formId, dependencies } = req.body; // dependencies: { country_id: 1, state_id: 5 }
-
+  const userId = req.userId;
+  const role = req.role
+  //console.log(role)
   try {
     // Fetch form details
     const form = await prismaClient.my_forms.findUnique({
@@ -31,8 +33,16 @@ export const Form = async (req: Request, res: Response) => {
     // Process `selectqry` and execute queries dynamically
     for (const column of columns) {
       if (column.selectqry) {
-        console.log("dileep", column.selectqry)
-        column.options = await executeDynamicQuery(column.selectqry, '');
+       let addquery;
+       if(column.field === "carrier_name"){
+          if(role==="CARRIER"){
+            addquery = " where user_id="+userId
+          }
+       }
+       else{
+        addquery=""
+       }
+        column.options = await executeDynamicQuery(column.selectqry+addquery, '');
       }
     }
 

@@ -58,6 +58,7 @@ export const SignUp = async (
     const token = jwt.sign(
       {
         userId: user.id,
+        role:user.role
       },
       JWT_SECRET
     );
@@ -90,6 +91,7 @@ export const login = async (req: Request, res: Response) => {
   const token = jwt.sign(
     {
       userId: user.id,
+      role:user.role
     },
     JWT_SECRET
   );

@@ -2,15 +2,17 @@ import { Request, Response } from "express";
 import { prismaClient } from "..";
 import moment from "moment";
 import ImageKit from "imagekit";
+import { dataSet } from "./dataset/dataSet";
+
 
 // interface TableDataResponse {
 //   headers: { field: string; headerName: string; width: number }[];
 //   data: any[];
 // }
 
-export const TableData = async (req: Request, res: Response) => { 
-  const { formId } = req.body;
-  console.log(formId)
+export const TableData = async (req: any, res: Response) => { 
+  const { formId, formIntData } = req.body;
+  const userId = req.userId;
   try {
     if (!formId) {
       console.error("Error: formId is missing or undefined");
@@ -27,7 +29,6 @@ export const TableData = async (req: Request, res: Response) => {
       where: { formid: validFormId },
       select: { dbtable: true },
     });
-    console.log("testing ------",tableInfo)
 
     if (!tableInfo || !tableInfo.dbtable) {
       console.error("Error: Table not found for formId:", validFormId);
@@ -35,7 +36,7 @@ export const TableData = async (req: Request, res: Response) => {
     }
 
     const fields = await prismaClient.my_forms_columns.findMany({
-      where: { formid: validFormId },
+      where: { formid: validFormId, listview:1 },
       select: {
         field: true,
         title: true,
@@ -68,9 +69,9 @@ export const TableData = async (req: Request, res: Response) => {
       updatedAt: row.updatedAt ? moment(row.updatedAt).format("YYYY-MM-DD HH:mm:ss") : null,
     }));
 
-   // console.log("Fetched Data:", allHeaders, data);
-    
-    return res.status(200).json({ headers: allHeaders, data } as any); // ✅ Correct return structure
+    const {f_headers, f_data } = await dataSet({formId, allHeaders, data, userId})  
+
+    return res.status(200).json({ headers: f_headers, data:f_data } as any); // ✅ Correct return structure
   } catch (error: any) {
     console.error("Error fetching table data:", error.message);
     return { headers: [], data: [] };
@@ -123,7 +124,6 @@ const imagekit = new ImageKit({
 });
 
 export const imageUpload = async (req: Request, res: Response) => { 
-  console.log(req.body)
   const authParams = imagekit.getAuthenticationParameters();
   res.send(authParams);
 }

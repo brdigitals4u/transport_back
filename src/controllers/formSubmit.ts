@@ -6,12 +6,12 @@ import { hashSync } from "bcrypt";
 import { JwtPayload } from "jsonwebtoken";
 import { transporter } from "../utils/mailTransporter";
 import { mailSend, mailSendUser } from "../utils/mailSend";
+import { errorCode } from "../exceptions/root";
 
 export const formSubmit = async (req: any, res: Response) => {
   const userId = req.userId;
-  //console.log(userId)
   const { formId, formData } = req.body;
-  
+
   try {
     if (!formId || typeof formId !== "string") {
       return res.json({ success: false, message: "Invalid table name" });
@@ -34,11 +34,39 @@ export const formSubmit = async (req: any, res: Response) => {
     if (!prismaClient[modelName]) {
       return res.json({ success: false, message: `Table does not exist in Prisma client` });
     }
-    const createdRecord = await (prismaClient[modelName] as any).create({
-      data: formData,
-    });
 
-    console.log(createdRecord)
+    let createdRecord
+
+    if(formId == "drivers"){
+        const {name, email} = formData
+        const user = await prismaClient.user.create({
+          data: {
+            name,
+            email,
+            role: "DRIVER",
+            password: hashSync('password', 10),
+            parent_user:userId
+          },
+        });
+      const message = name
+      await mailSendUser({message, email})
+
+      createdRecord = await (prismaClient[modelName] as any).create({
+        data: {...formData, userId:user.id},
+      });
+    }
+    else if(formId == "user"){
+        createdRecord = await (prismaClient[modelName] as any).create({
+        data: {...formData, parent_user:userId},
+      });
+    }
+    else{
+        createdRecord = await (prismaClient[modelName] as any).create({
+        data: formData,
+      });
+    }
+
+   
     
     if(dbtable.dbtable === "user"){
       const email = formData?.email

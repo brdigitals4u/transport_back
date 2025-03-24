@@ -90,13 +90,14 @@ model my_forms_sections {
 }
 
 model user {
-  id        Int       @id @default(autoincrement())    
-  name      String
-  email     String    @unique
-  password  String
-  createdAt DateTime  @default(now())
-  updatedAt DateTime? @updatedAt
-  role      Role
+  id          Int       @id @default(autoincrement())
+  name        String
+  email       String    @unique
+  password    String
+  parent_user Int?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime? @updatedAt
+  role        Role
 }
 
 model carrier {
@@ -159,13 +160,13 @@ model carrier {
   website              String?
   zipcode              String?
   city                 String?
-  user_id               Int?
+  user_id              Int?
   //load                 load[]
 }
 
 model trailer {
   id                       Int      @id @default(autoincrement())
-  type                     String?
+  type                     Int?
   model                    String?
   make                     String?
   vin                      String?
@@ -173,7 +174,7 @@ model trailer {
   plate_number             String?
   gvwr                     String?
   length                   String?
-  carrier_name             String?
+  carrier_name             Int?
   policy_no                String?
   provider                 String?
   policy_year              String?
@@ -223,6 +224,8 @@ model drivers {
   medical_certificate_expiry String?
   background_check_status    String?
   drug_test_status           String?
+  carrier_name               Int?
+  userId                     Int?
   createdAt                  DateTime @default(now())
   updatedAt                  DateTime @updatedAt
   //load                       load[]
@@ -372,6 +375,13 @@ model load {
 
   //carrier carrier? @relation(fields: [carrier_id], references: [id], onDelete: SetNull)
   //driver  drivers? @relation(fields: [driver_id], references: [id], onDelete: SetNull)
+}
+
+model gps {
+  id      Int    @id @default(autoincrement())
+  lat     String
+  log     String
+  user_Id Int
 }
 
 enum LoadStatus {

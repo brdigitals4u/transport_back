@@ -345,6 +345,7 @@ model loadorders {
   client_contact_person_delivery String?
   client_delivery_contact_phone  String?
   cleint_special_instructions    String?
+  carrier_name                   Int?
   createdAt                      DateTime @default(now())
   updatedAt                      DateTime @updatedAt
 

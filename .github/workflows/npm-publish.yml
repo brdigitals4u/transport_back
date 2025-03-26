@@ -26,7 +26,7 @@ jobs:
       - name: Deploy to EC2
         run: |
           ssh ubuntu@${{ secrets.EC2_HOST }} << 'EOF'
-            cd /var/www/transport_back || { git clone git@github.com:brdigitals4u/transport_back.git transport_back && cd transport_back; }
+            cd /var/www/my-app || { git clone git@github.com:brdigitals4u/transport_back.git my-app && cd my-app; }
             git pull origin main
             npm install
             pm2 restart all || pm2 start src/index.ts --name transport_back --interpreter=ts-node --  --port 5000

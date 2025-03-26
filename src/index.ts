@@ -34,5 +34,5 @@ export const prismaClient = new PrismaClient({
 app.use(ErrorMiddleware)
 
 app.listen(PORT, () => {
-  console.log(`[server]: Server is running at http://localhost:${PORT}`);
+  console.log(`[server]: Server is running port at http://localhost:${PORT}`);
 });

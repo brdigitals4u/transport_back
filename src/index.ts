@@ -31,6 +31,7 @@ export const prismaClient = new PrismaClient({
     log:['query']
 })
 
+
 app.use(ErrorMiddleware)
 
 app.listen(PORT, () => {

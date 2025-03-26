@@ -17,8 +17,6 @@ let corsOptions = {
   allowedHeaders: ['Content-Type', 'Authorization'], // Add other headers if needed
 };
 
-
-
 // Use the CORS middleware with your options
 app.use(cors(corsOptions));
 

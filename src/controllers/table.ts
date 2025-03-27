@@ -40,6 +40,7 @@ export const TableData = async (req: any, res: Response) => {
       select: {
         field: true,
         title: true,
+        selectqry:true
       },
       orderBy: { sortno: "asc" },
     });
@@ -53,17 +54,50 @@ export const TableData = async (req: any, res: Response) => {
     const allHeaders = [
       { field: "id", headerName: "Id"  },
       ...headers,
-      { field: "createdAt", headerName: "Create Date", width: 200 },
-      { field: "updatedAt", headerName: "Update Date", width: 200 },
+      // { field: "createdAt", headerName: "Create Date", width: 200 },
+      // { field: "updatedAt", headerName: "Update Date", width: 200 },
     ];
-
-    // ✅ Correct way to query a dynamic table name in Prisma
-    //const rawData = await moment.$queryRawUnsafe<any[]>(`SELECT * FROM "${tableInfo.dbtable}"`);
+    
+  
     const rawData = await prismaClient.$queryRawUnsafe<any[]>(`SELECT * FROM "${tableInfo.dbtable}"`);
+    
+
+
+    const lookupData: Record<string, Record<string, string>> = {};
+
+
+for (const field of fields) {
+  if (field.selectqry) {
+    const result = await prismaClient.$queryRawUnsafe<any[]>(field.selectqry);
+    
+    // Store lookup data as { id: name }
+    lookupData[field.field] = result.reduce((acc, row) => {
+      acc[row.id] = row.name; // Assuming the select query returns { id, name }
+      return acc;
+    }, {} as Record<string, string>);
+  }
+}
+
+
+// Transform `rawData` by replacing ID fields with actual names
+const transformedData = rawData.map((row) => {
+  const newRow = { ...row };
+  
+  for (const field of fields) {
+    if (lookupData[field.field]) {
+      newRow[field.field] = lookupData[field.field][row[field.field]] || row[field.field];
+    }
+  }
+
+  return newRow;
+});
+
+    // console.log("field data+++++++++++++++++++++++",fields)
+    // console.log("rowData+++++++++++++++++++++++", transformedData)
 
 
     // ✅ Format date fields using moment.js
-    const data = rawData.map((row: any) => ({
+    const data = transformedData.map((row: any) => ({
       ...row,
       createdAt: row.createdAt ? moment(row.createdAt).format("YYYY-MM-DD HH:mm:ss") : null,
       updatedAt: row.updatedAt ? moment(row.updatedAt).format("YYYY-MM-DD HH:mm:ss") : null,
